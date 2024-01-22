@@ -1,0 +1,23 @@
+CREATE TABLE Rol (nombre_rol varchar(40) NOT NULL, PRIMARY KEY (nombre_rol));
+CREATE TABLE Usuario (dni_usuario varchar(10) NOT NULL, nombre_usuario varchar(80) NOT NULL, email_usuario varchar(50) NOT NULL, pass_usuario varchar(50) NOT NULL, rol_usuario varchar(40) NOT NULL, PRIMARY KEY (dni_usuario));
+CREATE TABLE Pregunta (cod_pregunta tinyint NOT NULL AUTO_INCREMENT, enunciado_pregunta varchar(255) NOT NULL, descr_pregunta varchar(255), color_pregunta varchar(15) NOT NULL, PRIMARY KEY (cod_pregunta));
+CREATE TABLE Categoria (color_categoria varchar(15) NOT NULL, nombre_categoria varchar(30) NOT NULL, PRIMARY KEY (color_categoria));
+CREATE TABLE Centro (cod_centro int(5) NOT NULL AUTO_INCREMENT, nombre_centro varchar(100) NOT NULL, PRIMARY KEY (cod_centro));
+CREATE TABLE Clase (cod_clase varchar(10) NOT NULL, cod_centro int(5) NOT NULL, PRIMARY KEY (cod_clase, cod_centro));
+CREATE TABLE Grupo (cod_grupo varchar(20) NOT NULL, cod_clase varchar(10) NOT NULL, cod_centro int(5) NOT NULL, PRIMARY KEY (cod_grupo, cod_clase, cod_centro));
+CREATE TABLE Usuario_responde_pregunta (valor_respuesta tinyint NOT NULL, cod_pregunta tinyint NOT NULL, dni_usuario varchar(10) NOT NULL, PRIMARY KEY (cod_pregunta, dni_usuario));
+CREATE TABLE Usuario_forma_parte_de_clase (dni_usuario varchar(10) NOT NULL, cod_clase varchar(10) NOT NULL, cod_centro int(5) NOT NULL, PRIMARY KEY (dni_usuario, cod_clase, cod_centro));
+CREATE TABLE Usuario_administra_centro (dni_usuario varchar(10) NOT NULL, cod_centro int(5) NOT NULL, PRIMARY KEY (dni_usuario, cod_centro));
+CREATE TABLE Alumno_forma_parte_de_grupo (dni_usuario varchar(10) NOT NULL, cod_grupo varchar(20) NOT NULL, cod_clase varchar(10) NOT NULL, cod_centro int(5) NOT NULL, PRIMARY KEY (dni_usuario, cod_grupo, cod_clase, cod_centro));
+ALTER TABLE Usuario ADD CONSTRAINT FKUsuario686693 FOREIGN KEY (rol_usuario) REFERENCES Rol (nombre_rol) ON DELETE CASCADE;
+ALTER TABLE Pregunta ADD CONSTRAINT FKPregunta234365 FOREIGN KEY (color_pregunta) REFERENCES Categoria (color_categoria) ON DELETE CASCADE;
+ALTER TABLE Clase ADD CONSTRAINT FKClase226751 FOREIGN KEY (cod_centro) REFERENCES Centro (cod_centro) ON DELETE CASCADE;
+ALTER TABLE Grupo ADD CONSTRAINT FKGrupo691814 FOREIGN KEY (cod_clase, cod_centro) REFERENCES Clase (cod_clase, cod_centro) ON DELETE CASCADE;
+ALTER TABLE Usuario_responde_pregunta ADD CONSTRAINT FKUsuario_re721044 FOREIGN KEY (cod_pregunta) REFERENCES Pregunta (cod_pregunta) ON DELETE CASCADE;
+ALTER TABLE Usuario_responde_pregunta ADD CONSTRAINT FKUsuario_re80320 FOREIGN KEY (dni_usuario) REFERENCES Usuario (dni_usuario) ON DELETE CASCADE;
+ALTER TABLE Usuario_forma_parte_de_clase ADD CONSTRAINT FKUsuario_fo962859 FOREIGN KEY (dni_usuario) REFERENCES Usuario (dni_usuario) ON DELETE CASCADE;
+ALTER TABLE Usuario_forma_parte_de_clase ADD CONSTRAINT FKUsuario_fo781009 FOREIGN KEY (cod_clase, cod_centro) REFERENCES Clase (cod_clase, cod_centro) ON DELETE CASCADE;
+ALTER TABLE Usuario_administra_centro ADD CONSTRAINT FKUsuario_ad252946 FOREIGN KEY (dni_usuario) REFERENCES Usuario (dni_usuario) ON DELETE CASCADE;
+ALTER TABLE Usuario_administra_centro ADD CONSTRAINT FKUsuario_ad133889 FOREIGN KEY (cod_centro) REFERENCES Centro (cod_centro) ON DELETE CASCADE;
+ALTER TABLE Alumno_forma_parte_de_grupo ADD CONSTRAINT FKAlumno_for208066 FOREIGN KEY (dni_usuario) REFERENCES Usuario (dni_usuario) ON DELETE CASCADE;
+ALTER TABLE Alumno_forma_parte_de_grupo ADD CONSTRAINT FKAlumno_for457 FOREIGN KEY (cod_grupo, cod_clase, cod_centro) REFERENCES Grupo (cod_grupo, cod_clase, cod_centro) ON

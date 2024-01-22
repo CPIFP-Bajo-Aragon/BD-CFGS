@@ -1,0 +1,179 @@
+
+CREATE DATABASE agenda;
+USE agenda;
+
+/* Exercici 23 */
+
+DELIMITER //
+
+CREATE PROCEDURE taula (IN par CHAR)
+
+BEGIN
+    CASE (par)
+    WHEN 'T'
+    THEN 
+    CREATE TABLE diari(
+        codi    INT     AUTO_INCREMENT PRIMARY KEY,
+        data    DATE,
+        hora    TIME,
+        event   VARCHAR(40)
+)Engine=InnoDB;
+    WHEN 'E'
+    THEN
+    DROP TABLE IF EXISTS diari;
+    ELSE
+    SELECT 'Error!' Missatge;
+    END CASE;
+END//
+DELIMITER ;
+
+CALL taula('T');
+
+/* Exercici 24 */
+
+DELIMITER //
+
+CREATE PROCEDURE inser (IN dat DATE,IN hor TIME, IN ev VARCHAR(40))
+
+BEGIN
+   INSERT INTO diari VALUES (NULL,dat,hor,ev);
+END//
+DELIMITER ;
+
+CALL inser('2011/05/25','12:00','Reunió de direcció');
+
+/* Exercici 25:
+Crea un procediment anomenat elim que elimini tots els registres entre dues dates. Si deixem la primera data en
+blanc esborrar�  tots els registres anteriors a la segona data, i si deixem la segona data en blanc esborrar�  tots
+els registres posteriors a la primera data. Sempre les dates que indiquem estan incloses.
+Exemple d'execució: CALL elim(NULL,'2011/04/25');
+*/
+
+DELIMITER //
+
+CREATE PROCEDURE elim (IN dat DATE,IN dat2 DATE)
+
+BEGIN
+   IF dat IS NULL
+    THEN 
+    DELETE FROM diari WHERE data < dat2;
+    ELSEIF  dat2 IS NULL
+    THEN
+    DELETE FROM diari WHERE data > dat;
+    ELSEIF dat IS NOT NULL AND dat2 IS NOT NULL
+    THEN
+    DELETE FROM diari WHERE data BETWEEN dat AND dat2;
+    ELSE
+    SELECT 'Error!' Missatge;
+    END IF;    
+END//
+DELIMITER ;		
+
+CALL elim('2011/04/26','2011/09/26');
+
+/* Exercici 26:
+Crea un procediment anomenat posposar que, donada una data, endarrereixi l'esdeveniment un mes.
+Exemple d'execució: CALL postposar('2011/04/25'); */
+
+DELIMITER //
+
+CREATE PROCEDURE postposar(IN dat DATE)
+
+BEGIN
+     DECLARE par INT DEFAULT (SELECT MIN(codi) FROM diari);
+        DECLARE par2 INT DEFAULT (SELECT MAX(codi) FROM diari);
+    WHILE (par <=par2)
+    DO
+    IF ((SELECT data FROM diari WHERE codi = par)=dat)
+    THEN 
+    UPDATE diari SET data = ADDDATE(dat,30) WHERE codi = par;
+    END IF;
+    SET par := par+1;
+    END WHILE;    
+END//
+DELIMITER ;
+
+CALL postposar('2000/01/01');
+
+/*Exercici 27:
+Crea un procediment anomenat dietari que donada una data ens digui i una opció ens apareguin tots els
+esdeveniment de:
+- si l'opció és A els esdeveniments del mateix dia de la data.
+- si l'opció és B els esdeveniments de la setmana a que pertany la data.
+- si l'opció és C els esdeveniments del mes a que pertany la data.
+Exemple d'execució: CALL dietari('2011/05/25','A'); */
+
+DELIMITER //
+
+CREATE PROCEDURE dietari(IN dat DATE, IN class CHAR)
+
+BEGIN
+    DECLARE dat2 DATE;
+    CASE class
+    WHEN 'A'
+    THEN
+    SELECT * FROM diari WHERE data = dat;
+    WHEN 'B'
+    THEN
+    SET dat2 := (dat + INTERVAL 1 WEEK);
+    SELECT * FROM diari WHERE data BETWEEN dat AND dat2;
+    WHEN 'C'
+    THEN
+    SET dat2 := (dat + INTERVAL 1 MONTH);
+    SELECT * FROM diari WHERE data BETWEEN dat AND dat2;
+    ELSE
+    SELECT 'Error!' Missatge;
+    END CASE;    
+END//
+DELIMITER ;
+
+CALL dietari('2011/08/25','C');  
+
+/*Exercici 28:
+Crea un procediment anomenat inser_rep que faci insercions a la taula diari, de manera que inserir�  un
+esdeveniment repetit cada cert temps. Els par� metres que li donarem seran els següents:
+− Data d'inici de les insercions
+− Data final de les insercions
+− Hora de l'esdeveniment
+− Esdeveniment
+− Freqüència: D (di� ria), S (setmanal) i M (mensual)
+Exemple d'execució:
+Si volem inserir un esdeveniment que es repetir�  mensualment farem:
+CALL inser_rep('2011/05/25','2012/05/25','12:00','Reunió de direcció','M'); */
+
+
+DELIMITER //
+
+CREATE PROCEDURE inser_rep(IN dat DATE, IN dat2 DATE, IN hor TIME, IN assump VARCHAR(40), IN class CHAR)
+
+BEGIN
+    DECLARE dat3 DATE DEFAULT dat;
+    CASE class
+    WHEN 'D'
+    THEN
+    WHILE (dat3 <=dat2)
+    DO
+    INSERT INTO diari VALUES (NULL,dat3, hor, assump);
+    SET dat3 := ADDDATE(dat3,1);
+    END WHILE; 
+    WHEN 'M'
+    THEN
+    WHILE (dat3 <=dat2)
+    DO
+    INSERT INTO diari VALUES (NULL,dat3, hor, assump);
+    SET dat3 := (SELECT (dat3 + INTERVAL 1 MONTH));
+    END WHILE; 
+    WHEN 'W'
+    THEN
+    WHILE (dat3 <=dat2)
+    DO
+    INSERT INTO diari VALUES (NULL,dat3, hor, assump);
+    SET dat3 := (SELECT (dat3 + INTERVAL 1 WEEK));
+    END WHILE;
+    ELSE
+    SELECT 'Error!' Missatge;
+    END CASE;
+END//
+DELIMITER ;
+
+CALL inser_rep('2011/05/25','2011/05/30','12:00','Reunió diaria','D'); 

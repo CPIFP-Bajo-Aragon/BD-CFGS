@@ -1,0 +1,39 @@
+1 select * from personas;
+
+2 select dni, apellidos, funcion from personas;
+
+3 select apellidos from personas where localidad='LORCA';
+
+4 select apellidos from personas where localidad='LORCA' or localidad='MURCIA';
+
+5 select * from personas where localidad='MURCIA' and salario>1500;
+
+6 select * from personas where localidad='MURCIA' and salario>1500 and funcion='DIRECTOR';
+
+7 select * from personas where funcion='MEDICO' order by apellidos desc;
+
+8 select distinct localidad from personas;
+
+9 select * from personas where salario>1500 and funcion='MEDICO' order by salario desc;
+
+10 select * from personas where apellidos like 'M%';
+
+11 select * from personas where apellidos like '%M%' and funcion='CONSERJE';
+
+12 select * from personas where salario between 1500 and 2000;
+
+13 select * from personas where funcion in ('MEDICO','DIRECTOR');
+
+14 select * from personas where funcion not in('CONSERJE') and salario>1500 order by apellidos desc;
+
+15 select * from personas where localidad IN('MURCIA','CARTAGENA') and cod_hospital=1;
+
+16 select upper(apellidos) from personas where cod_hospital=1;
+
+17 select apellidos,length(apellidos) from personas;
+
+18 select apellidos,lower(localidad) from personas where cod_hospital not in (1);
+
+19 select * from personas where cod_hospital in (1,2) and salario>1500;
+
+20 select * from personas where cod_hospital not in (2) and localidad='murcia';

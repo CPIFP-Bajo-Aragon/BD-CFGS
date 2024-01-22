@@ -1,0 +1,17 @@
+root - bd2022
+
+apt-get install mysql-server	
+sudo apt install net-tools
+sudo ufw enable
+sudo ufw allow 3306
+sudo ufw allow 22
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+modificar el bind-address a 0.0.0.0
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+create user 'bd'@'%' identified by 'bd';
+grant all privileges on *.* to 'bd'@'%' with grant option;
+
+sudo netstat -plnut
+sudo netstat -plnt | grep :3306
